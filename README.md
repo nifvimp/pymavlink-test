@@ -21,15 +21,15 @@ GSC_PORT = '14550'
 Note: `GSC_PORT` does not really need to be changed unless the port is already in use or refuses to connect for 
 whatever reason. The `GSC_PORT` for SITL purposes is conventionally `14551` by the way.
 ## Configuring Ardupilot
-After running the `sim_vehicle.py` and connecting to webots, type output into the console. the expected output
-is below.
+After running the `sim_vehicle.py` and connecting to webots, type output into the console. It should output 
+like the example below:
 ~~~
 output
 STABILIZE> 1 outputs
 0: 172.22.84.123:14550
 1: 172.22.84.123:14551
 ~~~
-If you are missing ports just add them like below.
+If you are missing ports, just add them.
 ~~~
 output add 172.22.84.123:14550
 ~~~
