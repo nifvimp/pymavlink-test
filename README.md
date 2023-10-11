@@ -7,7 +7,10 @@ pip install .
 ~~~
 python setup.py install
 ~~~
-## Setup Environment
+All these are essenially doing is installing pymavlink and other dependencies through `setup.py`. These instructions
+are pointless if you are currently running the code if you aren't using a virtual environment and already have the 
+dependinces installed.
+## Setup Development Environment
 change the constants in `constants.py` to fit your environment.
 
 `GSC_HOST`: The ip of whatever system is running Ardupilot. (Only like this because I can't figure out how to get
@@ -33,3 +36,4 @@ If you are missing ports, just add them.
 ~~~
 output add 172.22.84.123:14550
 ~~~
+Please remember that you have to re-add your output port each time you launch `sim-vehicle.py`.
