@@ -9,11 +9,18 @@ print("Heartbeat from system (system %u component %u)" %
       (connection.target_system, connection.target_component))
 
 def guided():
-    connection.mav.command_long_send(
-        connection.target_system,
-        connection.target_component,
-        mavutil.mavlink.MAV_CMD_DO_SET_MODE,
-        0, 1, 216, 0, 0, 0, 0, 0)
+    connection.mav.set_mode_send(
+         connection.target_system,
+         mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
+         connection.mode_mapping()['GUIDED'])
+
+
+def stabilize():
+    connection.mav.set_mode_send(
+         connection.target_system,
+         mavutil.mavlink.MAV_MODE_FLAG_CUSTOM_MODE_ENABLED,
+         connection.mod_mapping()['STALIZE'])
+
 
 def arm():
     connection.mav.command_long_send(
