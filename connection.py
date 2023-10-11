@@ -27,7 +27,9 @@ def arm():
         connection.target_system,
         connection.target_component,
         mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
-        0, 1, 0, 0, 0, 0, 0, 0)
+        0,
+        1, 0, 0, 0, 0, 0, 0)
+    connection.motors_armed_wait()
 
 
 def disarm():
@@ -35,7 +37,9 @@ def disarm():
         connection.target_system,
         connection.target_component,
         mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
-        0, 0, 0, 0, 0, 0, 0, 0)
+        0,
+        0, 0, 0, 0, 0, 0, 0)
+    connection.motors_disarmed_wait()
 
 
 def takeoff(altitude):
@@ -43,4 +47,14 @@ def takeoff(altitude):
         connection.target_system,
         connection.target_component,
         mavutil.mavlink.MAV_CMD_NAV_TAKEOFF,
-        0, 0, 0, 0, 0, 0, 0, altitude)
+        0,
+        0, 0, 0, 0, 0, 0, altitude)
+
+
+def land():
+    connection.mav.command_long_send(
+        connection.target_system,
+        connection.target_component,
+        mavutil.mavlink.MAV_CMD_NAV_LAND,
+        0,
+        0, 0, 0, 0, 0, 0, 0)
