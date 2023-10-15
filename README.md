@@ -1,15 +1,15 @@
 # README
 ## install required packages
-enter one of the following commands into the environment terminal to setup the environment.
+Required packages for project. Can be installed using setup.py or downloaded directly using pip.
 ~~~
-pip install .
-~~~
-~~~
-python setup.py install
+pymavlink
+numpy
 ~~~
 ## Setup Environment
-change the constants in `constants.py` to fit your environment.
+change the constants in `constants.py` and `config.sh` to fit your environment.
 
+It might be possible to merge the files later.
+### For `constants.py`
 `GSC_HOST`: The ip of whatever system is running Ardupilot. (Only like this because I can't figure out how to get
 the connection to work any other way. I actually don't know or understand anything about networking stuff.)
 
@@ -20,16 +20,28 @@ GSC_PORT = '14550'
 ~~~
 Note: `GSC_PORT` does not really need to be changed unless the port is already in use or refuses to connect for 
 whatever reason. The `GSC_PORT` for SITL purposes is conventionally `14551` by the way.
-## Configuring Ardupilot
-After running the `sim_vehicle.py` and connecting to webots, type output into the console. It should output 
-like the example below:
+### For `config.sh`
+`param_file`: The absolute path to the param file of the drone that is being simulated in webots.
+
+`sim_vehicle`: The absolute path to `sim_vehicle.py` from the Ardupilot repo.
+
+`host` : The host of the connection to be added to mavproxy. Actually filling in the variable is optional since 
+the script will fill it in automatically with the localhost if it is not specified.
+
+`port` : The port the connection to be added to mavproxy will use.
+
 ~~~
-output
-STABILIZE> 1 outputs
-0: 172.22.84.123:14550
-1: 172.22.84.123:14551
+param_file="$HOME/ardupilot/libraries/SITL/examples/Webots_Python/params/iris.parm"
+sim_vehicle="$HOME/ardupilot/Tools/autotest/sim_vehicle.py"
+host=""
+port=14550
 ~~~
-If you are missing ports, just add them.
+
+## Launching SITL
+just run start.sh in terminal
 ~~~
-output add 172.22.84.123:14550
+./start.sh
 ~~~
+
+## Notes
+`start.sh` only work in linux.

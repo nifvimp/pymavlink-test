@@ -8,9 +8,9 @@ setup(
     author='NUAV',
     author_email='',
     description='',
-    packages=['pymavlink-test'],
+    packages=[],
     install_requires=[
         'pymavlink',
         'numpy',
-    ]
+    ],
 )
