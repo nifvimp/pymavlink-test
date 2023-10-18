@@ -12,9 +12,15 @@ print("Heartbeat from system (system %u component %u)" %
 
 def wait_altitude(altitude):
     curr_altitude = np.abs(connection.recv_match(type='LOCAL_POSITION_NED', blocking=True).z)
-    while(curr_altitude < altitude):
-        print(curr_altitude)
-        curr_altitude = np.abs(connection.recv_match(type='LOCAL_POSITION_NED', blocking=True).z)
+    if (altitude < curr_altitude):
+        while(curr_altitude < altitude):
+            print(curr_altitude)
+            curr_altitude = np.abs(connection.recv_match(type='LOCAL_POSITION_NED', blocking=True).z)
+    if (altitude > curr_altitude):
+        while(curr_altitude > altitude):
+            print(curr_altitude)
+            curr_altitude = np.abs(connection.recv_match(type='LOCAL_POSITION_NED', blocking=True).z)
+
 
 def guided():
      connection.set_mode(connection.mode_mapping()['GUIDED'])
