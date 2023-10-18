@@ -9,5 +9,5 @@ echo "will attempt to connect to ${socket}"
 $sim_vehicle \
         -v ArduCopter -w --model webots-python \
         --add-param-file=$param_file \
-        --sim-address=172.22.80.1 \
+        --sim-address="$host" \
         --out="udp:${socket}"
