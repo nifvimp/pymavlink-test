@@ -34,7 +34,12 @@ port=14550
 ~~~
 
 ## Launching SITL
-just run start.sh in terminal
+Run the following command to give scripts executable premissions:
+~~~
+chmod +x start.sh
+chmod +x close.sh
+~~~
+Then just run start.sh in terminal.
 ~~~
 ./start.sh
 ~~~
