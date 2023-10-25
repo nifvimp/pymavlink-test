@@ -4,6 +4,6 @@ sim_vehicle="$HOME/ardupilot/Tools/autotest/sim_vehicle.py"
   # absolute path to sim_vehicle.py
 host=""
   # optional - will fill in automatically with localhost if not specified
-simhost=172.22.80.1
+simhost=""
   # simulator host
 port=14550

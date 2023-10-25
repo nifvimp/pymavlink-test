@@ -2,7 +2,9 @@
 
 source "${PWD}/config.sh"
 defhost=$(hostname -I | tr -d '[:blank:]')
+defsimhost=$(cat /etc/resolv.conf | sed -n 's/.*nameserver \([0-9.]*\).*/\1/p')
 host=${host:-$defhost}
+simhost=${simhost:-$defsimhost}
 socket="${host}:${port}"
 echo "will attempt to connect to ${socket}"
 
