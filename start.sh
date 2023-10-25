@@ -6,7 +6,8 @@ defsimhost=$(cat /etc/resolv.conf | sed -n 's/.*nameserver \([0-9.]*\).*/\1/p')
 host=${host:-$defhost}
 simhost=${simhost:-$defsimhost}
 socket="${host}:${port}"
-echo "will attempt to connect to ${socket}"
+echo "Currently using ${simhost} as simulation host"
+echo "Will attempt to connect to ${socket}"
 
 $sim_vehicle \
         -v ArduCopter -w --model webots-python \
