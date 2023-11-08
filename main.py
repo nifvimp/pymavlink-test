@@ -8,10 +8,8 @@ GSC_PORT = 14550
 
 
 if __name__ == '__main__':
-    thread = Debug(['SYS_STATUS'])
-    thread.start()
-
-    wait_healthy()
+    # thread = Debug(['SYS_STATUS'])
+    # thread.start()
     arm()
     guided()
     takeoff(20)
