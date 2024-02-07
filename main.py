@@ -1,5 +1,4 @@
-from connection import *
-import time
+from src.connection import *
 
 GSC_HOST = '172.22.84.123'
 GSC_PORT = 14550
@@ -10,11 +9,14 @@ GSC_PORT = 14550
 if __name__ == '__main__':
     # thread = Debug(['SYS_STATUS'])
     # thread.start()
-    arm()
-    guided()
-    takeoff(20)
-    wait_altitude(19.5)
-    land()
-    wait_altitude(0.5)
-    disarm()
-    stabilize()
+    connection_string = 'udpin:%s:%s' % (GSC_HOST, GSC_PORT)
+    drone = DroneBase(socket=connection_string)
+    drone.wait_healthy()
+    drone.arm()
+    drone.guided()
+    drone.takeoff(20)
+    drone.wait_altitude(19.5)
+    drone.land()
+    drone.wait_altitude(0.5)
+    drone.disarm()
+    drone.stabilize()

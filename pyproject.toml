@@ -1,0 +1,30 @@
+[build-system]
+requires=["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pymavlink_wrapper_NUAV"
+# keywords = ["drone", "pymavlink", "wrapper"]
+version = "0.0.1"
+authors = [
+#    {name = "Kyle Moy", email = "moy.ky@northeastern.edu"},
+]
+description = "Simple wrapper for pymavlink."
+readme = "README.md"
+license = "license.txt"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+#    "License  :: OSI Approved :: MIT Lisense",
+#    "Operating System :: OS Indepndent",
+]
+dependencies = [
+    "numpy",
+    "pymavlink",
+]
+
+[project.urls]
+Homepage = "https://github.com/nifvimp/pymavlink-test"
+Repository = "https://github.com/nifvimp/pymavlink-test"
+Issues = "https://github.com/nifvimps/pymavlink-test/issues"
+
