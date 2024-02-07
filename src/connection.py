@@ -67,13 +67,20 @@ class DroneBase:
 
         # on exit
         import atexit
-        def onexit(): self.stop()
+
+        def onexit():
+            if self.alive:
+                self.stop()
 
         atexit.register(onexit)
 
-        @self.callback()
-        def print(_, msg):
-            print(msg)
+        # @self.callback()
+        # def listen(_, msg):
+        #     print(msg)
+
+        @self.handler('LOCAL_POSITION_NED')
+        def handle(_, msg):
+            print(f"Current position: ({msg.x}, {msg.y}, {msg.z})")
 
         # wait for heartbeat
         heartbeat = self.connection.wait_heartbeat(timeout=heartbeat_timeout)
@@ -81,8 +88,8 @@ class DroneBase:
         log.info("Heartbeat from system (system %u component %u)" %
                  (self.connection.target_system, self.connection.target_component))
 
-    def message_handler(self, msg):
-        func = self.msg_handlers[msg.get_type()]
+    def message_handler(self, mav, msg):
+        func = self.msg_handlers.get(msg.get_type())
         if func is not None:
             func(self, msg)
 
@@ -135,10 +142,11 @@ class DroneBase:
         t.start()
 
     def unregister_recurring(self, func):
-        t = self.recurring[func]
-        t.cancel()
-        t.join()
-        self.recurring.pop(func)
+        t = self.recurring.get(func)
+        if t is not None:
+            t.cancel()
+            t.join()
+            self.recurring.pop(func)
 
     def callback(self):
         def decorator(fn):
@@ -232,7 +240,8 @@ class DroneBase:
 
     def wait_healthy(self):
         sys_status = self.connection.recv_match(type='SYS_STATUS', blocking=True)
-        while 0 != sys_status.onboard_control_sensors_present ^ sys_status.onboard_control_sensors_health:
+        while 0 != sys_status.onboard_control_sensors_enabled & ~sys_status.onboard_control_sensors_health:
+            print(sys_status.onboard_control_sensors_enabled & ~sys_status.onboard_control_sensors_health)
             sys_status = self.connection.recv_match(type='SYS_STATUS', blocking=True)
             # print("present: {present}, health: {health}".format(
             #     present=sys_status.onboard_control_sensors_present,
@@ -318,4 +327,4 @@ class DroneBase:
         msg = self.connection.recv_match(type='LOCAL_POSITION_NED', blocking=True)
         while abs(msg.x - north) > 0.5 or abs(msg.y - east) > 0.5 or abs(msg.z - down) > 0.5:
             msg = self.connection.recv_match(type='LOCAL_POSITION_NED', blocking=True)
-            print(f"Current position: ({msg.x}, {msg.y}, {msg.z})")
+            # print(f"Current position: ({msg.x}, {msg.y}, {msg.z})")
