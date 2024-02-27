@@ -11,6 +11,7 @@ if __name__ == '__main__':
     # thread.start()
     connection_string = 'udpin:%s:%s' % (GSC_HOST, GSC_PORT)
     drone = DroneBase(socket=connection_string)
+    print(drone.connection.param_fetch_all())
     drone.wait_healthy()
     drone.arm()
     drone.guided()
