@@ -1,0 +1,38 @@
+version: "3.8"
+networks:
+  mavlink:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.12.0.0/16
+          gateway: 172.12.0.1
+services:
+  ardupilot:
+    container_name: vehicle
+    build: .
+    stdin_open: true
+    tty: true
+    networks:
+      mavlink:
+        ipv4_address: 172.12.0.2
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "5760:5760"
+      - "5762:5762"
+      - "5763:5763"
+      - "5501:5501"
+      - "5770:5770"
+      - "5772:5772"
+      - "5511:5511"
+      - "5780:5780"
+      - "5782:5782"
+      - "5783:5783"
+      - "5521:5521"
+      - "14550:14550"
+    volumes:
+      - .:/home/vehicle/src
+#    command:
+#      - "cat"
+#      - "/entrypoint.sh"
+#      - "/home/vehicle/src/start.sh"
