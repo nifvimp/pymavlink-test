@@ -15,6 +15,7 @@ if __name__ == '__main__':
     drone.wait_healthy()
     drone.arm()
     drone.guided()
+    print(drone.connection.param_fetch_all())
     drone.takeoff(20)
     drone.wait_altitude(19.5)
     drone.land()
