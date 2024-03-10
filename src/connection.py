@@ -2,11 +2,9 @@ import os
 import threading
 import time
 import traceback
-from abc import ABC
-from collections.abc import MutableMapping
 from queue import Queue
 from threading import Thread
-from typing import Optional
+from typing import Optional, Union
 import atexit
 
 import numpy as np
@@ -82,7 +80,10 @@ class DroneBase:
 
         # default callbacks
         self.register_callback(self.message_handler)
-        # self.register_callback(lambda self, msg: log.info(msg))
+
+        @self.callback()
+        def listener(_, msg):
+            log.info(msg)
 
         # default handler
         self.register_handler('COMMAND_ACK', self.cmd_ack)
@@ -206,7 +207,7 @@ class DroneBase:
 
         return decorator
 
-    def handler(self, name: str):
+    def handler(self, name: Union[str, list]):
         def decorator(fn):
             if isinstance(name, list):
                 for n in name:
@@ -224,8 +225,6 @@ class DroneBase:
             self.register_recurring(fn, interval=delay)
 
         return decorator
-
-    # TODO:
 
     #####################################################################################
     #                                     UTILITY                                       #
@@ -385,15 +384,24 @@ class DroneBase:
     def __str__(self) -> str:
         return "Drone ;p;"
 
-class Properties(MutableMapping, ABC):
-    def __init__(self, drone: DroneBase):
-        super().__init__()
 
-class DroneProperty:
+class Attribute:
     observers = []
 
-    def __init__(self, drone: DroneBase):
-        drone.property(self)
+    def __init__(self, name: str, drone: DroneBase):
+        setattr(drone, name, self)
+        self._drone = drone
+        self._name = name
+
+    def update(self, name: Union[str, list[str]]):
+        def decorator(fn):
+            @self._drone.handler(name)
+            def wrapper(msg):
+                fn(msg)
+                for observer in self.observers:
+                    observer(self)
+
+        return decorator
 
     def subscribe(self):
         def decorator(fn):
@@ -401,9 +409,40 @@ class DroneProperty:
 
         return decorator
 
-    # TODO: parse message // kalman filter anyone?
-    # Default MAV_DATA_STREAM_ALL Message
-    """
+
+class LocalLocation(Attribute):
+    def __init__(self, drone: DroneBase):
+        super().__init__("local_location", drone)
+
+        @self.update('LOCAL_POSITION_NED')
+        def listener(_, msg):
+            self._x = msg.x  # +north
+            self._y = msg.y  # +east
+            self._z = msg.z  # +down
+            self._vx = msg.vx
+            self._vy = msg.vy
+            self._vz = msg.vz
+
+
+class GlobalLocation(Attribute):
+    def __init__(self, drone: DroneBase):
+        super().__init__("global_location", drone)
+
+        @self.update('GLOBAL_POSITION_INT')
+        def listener(_, msg):
+            self._lat = msg.lat
+            self._lon = msg.lon
+            self._alt = msg.alt
+            self._relative_alt = msg.relative_alt
+
+        @self.update('GPS_RAW_INT')
+        def listener(_, msg):
+            self._rawlat = msg.lat
+            self._rawlon = msg.lon
+            self._rawalt = msg.alt
+
+
+"""
 SIMSTATE
     {roll: -5.571140718529932e-05, pitch: 7.679801638005301e-05, yaw: -0.0026232670061290264,
      xacc: -7.704182962697814e-07, yacc: -1.2247164704604074e-06, zacc: -9.791999816894531, xgyro: 6.25365792075172e-05,
