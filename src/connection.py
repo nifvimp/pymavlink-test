@@ -80,10 +80,7 @@ class DroneBase:
 
         # default callbacks
         self.register_callback(self.message_handler)
-
-        @self.callback()
-        def listener(_, msg):
-            log.info(msg)
+        # self.register_callback(lambda self, msg: log.info(msg))
 
         # default handler
         self.register_handler('COMMAND_ACK', self.cmd_ack)
