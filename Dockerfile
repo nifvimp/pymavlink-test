@@ -1,39 +1,43 @@
 # Sourced from: https://github.com/ArduPilot/ardupilot/blob/master/Dockerfile
-FROM ubuntu:22.04
+# Sourced from: https://www.youtube.com/watch?v=UEre6Bd75dw
+FROM cyberbotics/webots:R2023b-ubuntu22.04
 SHELL ["/bin/bash", "-c"]
 
-ARG DEBIAN_FRONTEND=noninteractive
+ARG USER_NAME=vehicle
 ARG USER_UID=1000
 ARG USER_GID=1000
 
 ARG BOARD=sitl
 ARG VEHICLE=copter
 
-WORKDIR /home/vehicle
-
-RUN groupadd vehicle --gid ${USER_GID}\
-    && useradd -l -m vehicle -u ${USER_UID} -g ${USER_GID} -s /bin/bash
-
-RUN apt-get update && apt-get install --no-install-recommends -y \
-    bash-completion \
+RUN apt-get update
+RUN apt-get install --no-install-recommends -y \
     lsb-release \
     sudo \
     tzdata \
+    bash-completion \
+    rsync \
     iproute2 \
+    net-tools \
     git
 
-ENV USER=vehicle
+RUN groupadd ${USER_NAME} --gid ${USER_GID}\
+    && useradd -l -m ${USER_NAME} -u ${USER_UID} -g ${USER_GID} -s /bin/bash
 
-RUN echo "vehicle ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/vehicle \
-    && chmod 0440 /etc/sudoers.d/vehicle \
-    && chown -R vehicle:vehicle /home/vehicle
+ENV USER=${USER_NAME}
 
-USER vehicle
+RUN echo "vehicle ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USER_NAME} \
+    && chmod 0440 /etc/sudoers.d/${USER_NAME} \
+    && chown -R ${USER_NAME}:${USER_NAME} /home/${USER_NAME}
+
+USER ${USER_NAME}
+
+WORKDIR /home/${USER_NAME}
 
 RUN git config --global http.sslverify false \
     && git clone --recurse-submodules https://github.com/ArduPilot/ardupilot.git
 
-WORKDIR /home/vehicle/ardupilot
+WORKDIR /home/${USER_NAME}/ardupilot
 
 ENV SKIP_AP_EXT_ENV=1 SKIP_AP_GRAPHIC_ENV=1 SKIP_AP_COV_ENV=1 SKIP_AP_GIT_CHECK=1
 RUN source Tools/environment_install/install-prereqs-ubuntu.sh -y
@@ -41,45 +45,30 @@ RUN source Tools/environment_install/install-prereqs-ubuntu.sh -y
 RUN echo "alias waf=\"/${USER_NAME}/waf\"" >> ~/.ardupilot_env \
     && echo "PATH=\"\$HOME/.local/bin:\$PATH\"" >> ~/.ardupilot_env
 
-RUN source ~/.bashrc \
+RUN source ~/.profile \
     && ./waf configure --board ${BOARD} \
     && ./waf ${VEHICLE}
 
-#WORKDIR /home/vehicle/src
+ENV PULSE_SERVER=/temp/PulseServer
+ENV DISPLAY=:0
 
-RUN python3 -m pip install --user --no-deps --no-cache-dir future empy pexpect ptyprocess
-
-WORKDIR /home/vehicle
-
-RUN export ENTRYPOINT="/home/vehicle/entrypoint.sh" \
-    && echo "#!/bin/bash" > $ENTRYPOINT \
-    && echo "set -e" >> $ENTRYPOINT \
-    && echo "source ~/.ardupilot_env" >> $ENTRYPOINT \
-    # TODO: put python project setup startup script stuff here
-    && echo 'exec "$@"' >> $ENTRYPOINT \
-    && chmod +x $ENTRYPOINT \
-    && sudo mv $ENTRYPOINT "/entrypoint.sh"
+ENV VEHICLE_HOME /usr/local/vehicle
+ENV PATH /usr/local/vehicle:${PATH}
 
 RUN sudo apt-get clean \
     && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# SITL 1
-EXPOSE 5760/tcp
-EXPOSE 5762/tcp
-EXPOSE 5763/tcp
-EXPOSE 5501
-# SITL 2
-EXPOSE 5770/tcp
-EXPOSE 5772/tcp
-EXPOSE 5511
-# SITL 3
-EXPOSE 5780/tcp
-EXPOSE 5782/tcp
-EXPOSE 5783/tcp
-EXPOSE 5521
-# Multicast
-EXPOSE 14550/tcp
-EXPOSE 14550/udp
+# TODO: put python project setup startup script stuff here
+RUN export ENTRYPOINT="/home/vehicle/entrypoint.sh" \
+    && echo "#!/bin/bash" > $ENTRYPOINT \
+    && echo "set -e" >> $ENTRYPOINT \
+    && echo "source ~/.ardupilot_env" >> $ENTRYPOINT \
+    && echo "rsync -a $VEHICLE_HOME ~/ --exclude-from=$VEHICLE_HOME/.gitignore" >> $ENTRYPOINT \
+    && echo 'exec "$@"' >> $ENTRYPOINT \
+    && chmod +x $ENTRYPOINT \
+    && sudo mv $ENTRYPOINT "/entrypoint.sh"
+
+WORKDIR /home/${USER_NAME}
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/bin/bash"]
