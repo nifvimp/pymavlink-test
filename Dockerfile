@@ -1,8 +1,10 @@
 # Sourced from: https://github.com/ArduPilot/ardupilot/blob/master/Dockerfile
 # Sourced from: https://www.youtube.com/watch?v=UEre6Bd75dw
+# Base Image - Webots Ubuntu20.04
 FROM cyberbotics/webots:R2023b-ubuntu22.04
 SHELL ["/bin/bash", "-c"]
 
+# Docker Arguments
 ARG USER_NAME=vehicle
 ARG USER_UID=1000
 ARG USER_GID=1000
@@ -10,17 +12,19 @@ ARG USER_GID=1000
 ARG BOARD=sitl
 ARG VEHICLE=copter
 
-RUN apt-get update
-RUN apt-get install --no-install-recommends -y \
+# Install Nessessary Packages
+RUN apt-get update && apt-get install --no-install-recommends -y \
     lsb-release \
     sudo \
     tzdata \
     bash-completion \
+    curl \
     rsync \
     iproute2 \
     net-tools \
     git
 
+# Setup Users and Premissions
 RUN groupadd ${USER_NAME} --gid ${USER_GID}\
     && useradd -l -m ${USER_NAME} -u ${USER_UID} -g ${USER_GID} -s /bin/bash
 
@@ -34,6 +38,7 @@ USER ${USER_NAME}
 
 WORKDIR /home/${USER_NAME}
 
+# Install Ardupilots Repository
 RUN git config --global http.sslverify false \
     && git clone --recurse-submodules https://github.com/ArduPilot/ardupilot.git
 
@@ -45,20 +50,37 @@ RUN source Tools/environment_install/install-prereqs-ubuntu.sh -y
 RUN echo "alias waf=\"/${USER_NAME}/waf\"" >> ~/.ardupilot_env \
     && echo "PATH=\"\$HOME/.local/bin:\$PATH\"" >> ~/.ardupilot_env
 
+# Setup Ardupilot Environment
 RUN source ~/.profile \
     && ./waf configure --board ${BOARD} \
     && ./waf ${VEHICLE}
 
+## Install Nividia Drivers
+#RUN curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+#  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+#    sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+#    sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+#
+#RUN sudo apt-get update && sudo apt-get install -y nvidia-container-toolkit
+#
+#RUN sudo nvidia-ctk runtime configure --runtime=docker
+
+# TODO: compile sim_vehicle.py before hand - so annoying to wait
+
+# Setup Display (wsl)
 ENV PULSE_SERVER=/temp/PulseServer
 ENV DISPLAY=:0
 
+# Enviroment variables source code
 ENV VEHICLE_HOME /usr/local/vehicle
 ENV PATH /usr/local/vehicle:${PATH}
 
+# Cleanup Installs
 RUN sudo apt-get clean \
     && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # TODO: put python project setup startup script stuff here
+# Create Entrypoint Script
 RUN export ENTRYPOINT="/home/vehicle/entrypoint.sh" \
     && echo "#!/bin/bash" > $ENTRYPOINT \
     && echo "set -e" >> $ENTRYPOINT \
@@ -68,6 +90,10 @@ RUN export ENTRYPOINT="/home/vehicle/entrypoint.sh" \
     && chmod +x $ENTRYPOINT \
     && sudo mv $ENTRYPOINT "/entrypoint.sh"
 
+# Expose Webots Server
+EXPOSE 1234
+
+# Setup Entrypoint
 WORKDIR /home/${USER_NAME}
 
 ENTRYPOINT ["/entrypoint.sh"]

@@ -6,23 +6,26 @@ volumes:
       type: none
       device: .
       o: bind
-  display:
-    driver: local
-    driver_opts:
-      type: none
-      device: \\wsl.localhost\Ubuntu\mnt\wslg
-      o: bind
 services:
   simulation:
+#    deploy:
+#      resources:
+#        reservations:
+#          devices:
+#            - driver: nvidia
+#              count: all
+#              capabilities: [gpu]
     container_name: sim
     build: .
     stdin_open: true
     tty: true
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    ports:
+      - "1234:1234"
     volumes:
       - vehicle:/usr/local/vehicle
-      - display:/tmp
+#      - \\wsl.localhost\Ubuntu\mnt\wslg:/tmp
 # TODO: specify script to run on boot?
 #    command:
 #      - "/home/vehicle/src/start.sh"

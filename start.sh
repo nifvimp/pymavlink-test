@@ -2,8 +2,8 @@
 
 param_file="$HOME/ardupilot/libraries/SITL/examples/Webots_Python/params/iris.parm"
 sim_vehicle="$HOME/ardupilot/Tools/autotest/sim_vehicle.py"
-host=""
-simhost=""
+host="127.0.0.1"
+simhost="127.0.0.1"
 port=14550
 defhost=$(hostname -I | awk '{print $1}')
 defsimhost=$(grep -w 'host.docker.internal' /etc/hosts | awk '{print $1}')
