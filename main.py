@@ -1,10 +1,7 @@
 from src.connection import *
 
-GSC_HOST = '172.22.84.123'
+GSC_HOST = '127.0.0.1'
 GSC_PORT = 14550
-
-
-
 
 if __name__ == '__main__':
     # thread = Debug(['SYS_STATUS'])

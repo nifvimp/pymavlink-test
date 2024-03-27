@@ -1,3 +1,10 @@
-/pymavlink_test.egg-info/
-/build
-/dist
+pymavlink_test.egg-info/
+__pycache__
+build
+dist
+venv
+.idea
+.git
+eeprom.bin
+mav.tlog
+mav.tlog.raw

@@ -1,8 +1,12 @@
 #!/bin/bash
 
-source "${PWD}/config.sh"
-defhost=$(hostname -I | tr -d '[:blank:]')
-defsimhost=$(cat /etc/resolv.conf | sed -n 's/.*nameserver \([0-9.]*\).*/\1/p')
+param_file="$HOME/ardupilot/libraries/SITL/examples/Webots_Python/params/iris.parm"
+sim_vehicle="$HOME/ardupilot/Tools/autotest/sim_vehicle.py"
+host="127.0.0.1"
+simhost="127.0.0.1"
+port=14550
+defhost=$(hostname -I | awk '{print $1}')
+defsimhost=$(grep -w 'host.docker.internal' /etc/hosts | awk '{print $1}')
 host=${host:-$defhost}
 simhost=${simhost:-$defsimhost}
 socket="${host}:${port}"
