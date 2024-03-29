@@ -22,10 +22,19 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     rsync \
     iproute2 \
     net-tools \
-    git
+    git \
+    nvidia-container-toolkit
+
+## Install Nividia Drivers
+RUN curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list \
+  && sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' \
+  && tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+RUN nvidia-ctk runtime configure --runtime=docker
 
 # Setup Users and Premissions
-RUN groupadd ${USER_NAME} --gid ${USER_GID}\
+RUN groupadd ${USER_NAME} --gid ${USER_GID} \
     && useradd -l -m ${USER_NAME} -u ${USER_UID} -g ${USER_GID} -s /bin/bash
 
 ENV USER=${USER_NAME}
@@ -55,17 +64,9 @@ RUN source ~/.profile \
     && ./waf configure --board ${BOARD} \
     && ./waf ${VEHICLE}
 
-## Install Nividia Drivers
-#RUN curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
-#  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
-#    sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
-#    sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
-#
-#RUN sudo apt-get update && sudo apt-get install -y nvidia-container-toolkit
-#
-#RUN sudo nvidia-ctk runtime configure --runtime=docker
-
-# TODO: compile sim_vehicle.py before hand - so annoying to wait
+ # Cleanup Installs
+RUN sudo apt-get clean \
+    && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Setup Display (wsl)
 ENV PULSE_SERVER=/temp/PulseServer
@@ -74,10 +75,6 @@ ENV DISPLAY=:0
 # Enviroment variables source code
 ENV VEHICLE_HOME /usr/local/vehicle
 ENV PATH /usr/local/vehicle:${PATH}
-
-# Cleanup Installs
-RUN sudo apt-get clean \
-    && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # TODO: put python project setup startup script stuff here
 # Create Entrypoint Script
