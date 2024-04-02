@@ -59,10 +59,10 @@ RUN source Tools/environment_install/install-prereqs-ubuntu.sh -y
 RUN echo "alias waf=\"/${USER_NAME}/waf\"" >> ~/.ardupilot_env \
     && echo "PATH=\"\$HOME/.local/bin:\$PATH\"" >> ~/.ardupilot_env
 
-# Setup Ardupilot Environment
-RUN source ~/.profile \
-    && ./waf configure --board ${BOARD} \
-    && ./waf ${VEHICLE}
+## Setup Ardupilot Environment - seems like ardupilot build here doesn't translate to build at runtime
+#RUN source ~/.profile \
+#    && ./waf configure --board ${BOARD} \
+#    && ./waf ${VEHICLE}
 
  # Cleanup Installs
 RUN sudo apt-get clean \
@@ -76,7 +76,6 @@ ENV DISPLAY=:0
 ENV VEHICLE_HOME /usr/local/vehicle
 ENV PATH /usr/local/vehicle:${PATH}
 
-# TODO: put python project setup startup script stuff here
 # Create Entrypoint Script
 RUN export ENTRYPOINT="/home/vehicle/entrypoint.sh" \
     && echo "#!/bin/bash" > $ENTRYPOINT \
@@ -84,7 +83,10 @@ RUN export ENTRYPOINT="/home/vehicle/entrypoint.sh" \
     && echo "source ~/.ardupilot_env" >> $ENTRYPOINT \
     && echo "rm -rf vehicle" >> $ENTRYPOINT \
     && echo "rsync -a $VEHICLE_HOME ~/ --exclude-from=$VEHICLE_HOME/.gitignore" >> $ENTRYPOINT \
-    && echo "pip install $VEHICLE_HOME/" >> $ENTRYPOINT \
+    && echo "pip install -r $VEHICLE_HOME/requirements.txt" >> $ENTRYPOINT \
+    && echo "/bin/bash -c \"cd \$HOME/ardupilot; \
+             python3 waf configure --board $BOARD; \
+             python3 waf $VEHICLE\"" >> $ENTRYPOINT \
     && echo 'exec "$@"' >> $ENTRYPOINT \
     && chmod +x $ENTRYPOINT \
     && sudo mv $ENTRYPOINT "/entrypoint.sh"

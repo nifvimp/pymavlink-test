@@ -8,15 +8,19 @@ volumes:
       o: bind
 services:
   simulation:
-#    deploy:
-#      resources:
-#        reservations:
-#          devices:
-#            - driver: nvidia
-#              count: all
-#              capabilities: [gpu]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     container_name: sim
-    build: .
+    build:
+      context: .
+      args:
+        - VEHICLE=copter
+        - BOARD=sitl
     stdin_open: true
     tty: true
     extra_hosts:
@@ -26,5 +30,6 @@ services:
     volumes:
       - vehicle:/usr/local/vehicle
       - \\wsl.localhost\Ubuntu\mnt\wslg:/tmp
+    # Starting directory is ~/
 #    command:
 #      - "./vehicle/sim.sh"
