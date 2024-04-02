@@ -1,27 +1,26 @@
 [build-system]
-requires=["setuptools>=61.0"]
+    requires=["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pymavlink_wrapper_NUAV"
-# keywords = ["drone", "pymavlink", "wrapper"]
+name = "pymavlink_docker"
 version = "0.0.1"
-authors = [
-#    {name = "Kyle Moy", email = "moy.ky@northeastern.edu"},
-]
-description = "Simple wrapper for pymavlink."
-readme = "README.md"
-license = "license.txt"
-requires-python = ">=3.11"
-classifiers = [
-    "Programming Language :: Python :: 3",
-#    "License  :: OSI Approved :: MIT Lisense",
-#    "Operating System :: OS Indepndent",
-]
 dependencies = [
     "numpy",
     "pymavlink",
     "loguru",
+]
+requires-python = ">=3.10"
+authors = [
+    {name = "Kyle Moy", email = "moy.ky@northeastern.edu"},
+]
+description = "Simple Docker for Webots-Ardupilots SITL."
+readme = "README.md"
+license = {file = "LICENSE.txt"}
+keywords = ["drone", "simulation", "docker", "ardupilot", "webots", "SITL", "mavlink", "pymavlink"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: Windows",
 ]
 
 [project.urls]

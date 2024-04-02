@@ -26,5 +26,5 @@ services:
     volumes:
       - vehicle:/usr/local/vehicle
       - \\wsl.localhost\Ubuntu\mnt\wslg:/tmp
-    command:
-      - "./vehicle/sim.sh"
+#    command:
+#      - "./vehicle/sim.sh"

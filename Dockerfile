@@ -82,7 +82,9 @@ RUN export ENTRYPOINT="/home/vehicle/entrypoint.sh" \
     && echo "#!/bin/bash" > $ENTRYPOINT \
     && echo "set -e" >> $ENTRYPOINT \
     && echo "source ~/.ardupilot_env" >> $ENTRYPOINT \
+    && echo "rm -rf vehicle" >> $ENTRYPOINT \
     && echo "rsync -a $VEHICLE_HOME ~/ --exclude-from=$VEHICLE_HOME/.gitignore" >> $ENTRYPOINT \
+    && echo "pip install $VEHICLE_HOME/" >> $ENTRYPOINT \
     && echo 'exec "$@"' >> $ENTRYPOINT \
     && chmod +x $ENTRYPOINT \
     && sudo mv $ENTRYPOINT "/entrypoint.sh"

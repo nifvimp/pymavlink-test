@@ -1,4 +1,4 @@
-pymavlink_test.egg-info/
+*.egg-info/
 __pycache__
 build
 dist
