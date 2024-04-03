@@ -9,8 +9,8 @@ ARG USER_NAME=vehicle
 ARG USER_UID=1000
 ARG USER_GID=1000
 
-ARG BOARD=sitl
-ARG VEHICLE=copter
+#ARG VEHICLE=copter
+#ARG BOARD=sitl
 
 # Install Nessessary Packages
 RUN apt-get update && apt-get install --no-install-recommends -y \
@@ -23,6 +23,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     iproute2 \
     net-tools \
     git \
+    nano \
+    vim \
+    gedit \
     nvidia-container-toolkit
 
 ## Install Nividia Drivers
@@ -81,12 +84,8 @@ RUN export ENTRYPOINT="/home/vehicle/entrypoint.sh" \
     && echo "#!/bin/bash" > $ENTRYPOINT \
     && echo "set -e" >> $ENTRYPOINT \
     && echo "source ~/.ardupilot_env" >> $ENTRYPOINT \
-    && echo "rm -rf vehicle" >> $ENTRYPOINT \
-    && echo "rsync -a $VEHICLE_HOME ~/ --exclude-from=$VEHICLE_HOME/.gitignore" >> $ENTRYPOINT \
-    && echo "pip install -r $VEHICLE_HOME/requirements.txt" >> $ENTRYPOINT \
-    && echo "/bin/bash -c \"cd \$HOME/ardupilot; \
-             python3 waf configure --board $BOARD; \
-             python3 waf $VEHICLE\"" >> $ENTRYPOINT \
+    && echo "source ~/.profile" >> $ENTRYPOINT \
+    && echo "rsync -ar $VEHICLE_HOME ~/ --exclude-from=$VEHICLE_HOME/.gitignore" >> $ENTRYPOINT \
     && echo 'exec "$@"' >> $ENTRYPOINT \
     && chmod +x $ENTRYPOINT \
     && sudo mv $ENTRYPOINT "/entrypoint.sh"

@@ -16,11 +16,7 @@ services:
               count: all
               capabilities: [gpu]
     container_name: sim
-    build:
-      context: .
-      args:
-        - VEHICLE=copter
-        - BOARD=sitl
+    build: .
     stdin_open: true
     tty: true
     extra_hosts:
@@ -30,6 +26,5 @@ services:
     volumes:
       - vehicle:/usr/local/vehicle
       - \\wsl.localhost\Ubuntu\mnt\wslg:/tmp
-    # Starting directory is ~/
-#    command:
-#      - "./vehicle/sim.sh"
+    command:
+      - ./vehicle/scripts/sim-start.sh
