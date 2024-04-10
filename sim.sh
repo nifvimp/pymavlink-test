@@ -1,5 +1,34 @@
 #!/bin/bash
+# Parse Arguments
+usage() {
+    echo "Usage: $0 [OPTIONS] world_file param_file entrypoint"
+    echo "Options:"
+    echo "  -r <simulation_path>    Specify requirements.txt path (default: ~/vehicle/requirements.txt)"
+    echo ""
+    echo "Note: Entrypoint and requirements.txt must be relative paths from the root of the project directory"
+    exit 1
+}
 
-# TODO: add options
-docker-compose exec simulation rsync -ar /usr/local/vehicle ~/ --exclude-from=/usr/local/vehicle/.gitignore
-docker-compose exec simulation ./vehicle/scripts/sim-run.sh
+pos_args=()
+while [ $OPTIND -le "$#" ]
+do
+    if getopts S:s:h:p:v:m:x: opt
+    then
+        case "$opt" in
+            r) requirements="$OPTARG";;
+            *) usage;;
+        esac
+    else
+        pos_args+=("${!OPTIND}")
+        shift
+    fi
+done
+
+export WORLD="${pos_args[0]}"
+export PARAM="${pos_args[1]}"
+entrypoint="${pos_args[2]}"
+
+# doesn't work because of
+docker-compose up --wait
+x-terminal-emulator -e "docker-compose attach simulation"
+docker-compose exec simulation ./vehicle/scripts/sim-run.sh "${requirements:+"-r $requirements"} $entrypoint"

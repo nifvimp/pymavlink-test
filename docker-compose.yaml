@@ -25,6 +25,10 @@ services:
       - "1234:1234"
     volumes:
       - vehicle:/usr/local/vehicle
-      - \\wsl.localhost\Ubuntu\mnt\wslg:/tmp
-    command:
-      - ./vehicle/scripts/sim-start.sh
+#      - \\wsl.localhost\Ubuntu\mnt\wslg:/tmp
+    command: "/bin/bash -c
+              'if [ -z \"$$WORLD\" ]; then export WORLD=\"$env:WORLD\"; fi;
+               if [ -z \"$$PARAM\" ]; then export PARAM=\"$env:PARAM\"; fi;
+               if [ \"$$WORLD\" == \":WORLD\" ]; then export WORLD=\"$WORLD\"; fi;
+               if [ \"$$PARAM\" == \":PARAM\" ]; then export PARAM=\"$PARAM\"; fi;
+               ./vehicle/scripts/sim-start.sh'"
