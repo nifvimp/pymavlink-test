@@ -12,7 +12,7 @@ usage() {
 pos_args=()
 while [ $OPTIND -le "$#" ]
 do
-    if getopts S:s:h:p:v:m:x: opt
+    if getopts S:s:h:p:v:m:x:r: opt
     then
         case "$opt" in
             r) requirements="$OPTARG";;
