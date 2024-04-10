@@ -28,7 +28,12 @@ export WORLD="${pos_args[0]}"
 export PARAM="${pos_args[1]}"
 entrypoint="${pos_args[2]}"
 
-# doesn't work because of
 docker-compose up --wait
-x-terminal-emulator -e "docker-compose attach simulation"
-docker-compose exec simulation ./vehicle/scripts/sim-run.sh "${requirements:+"-r $requirements"} $entrypoint"
+
+# Check if the platform is Windows
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+    mintty winpty bash -lc "docker-compose attach simulation"
+else
+    x-terminal-emulator -e "docker-compose attach simulation"
+fi
+docker-compose exec simulation ./vehicle/scripts/sim-run.sh "${requirements:+"-r $requirements "}$entrypoint"
