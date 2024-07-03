@@ -2,7 +2,7 @@ from dronekit import connect, VehicleMode
 from pymavlink import mavutil
 import time
 
-print("Launching Drone Control Script...")
+print("Launching Drone Control Script 2...")
 
 vehicle = connect('127.0.0.1:60000', heartbeat_timeout=120, wait_ready=True)
 
@@ -35,22 +35,22 @@ def speed_msg(x, y, z):
 t = 10 * 10 # 10 Hz
 
 for i in range(t):
-  msg = speed_msg(5, 0, 0)
-  vehicle.send_mavlink(msg)
-  time.sleep(0.1)
-
-for i in range(t):
-  msg = speed_msg(0, 5, 0)
-  vehicle.send_mavlink(msg)
-  time.sleep(0.1)
-
-for i in range(t):
   msg = speed_msg(-5, 0, 0)
   vehicle.send_mavlink(msg)
   time.sleep(0.1)
 
 for i in range(t):
   msg = speed_msg(0, -5, 0)
+  vehicle.send_mavlink(msg)
+  time.sleep(0.1)
+
+for i in range(t):
+  msg = speed_msg(5, 0, 0)
+  vehicle.send_mavlink(msg)
+  time.sleep(0.1)
+
+for i in range(t):
+  msg = speed_msg(0, 5, 0)
   vehicle.send_mavlink(msg)
   time.sleep(0.1)
 

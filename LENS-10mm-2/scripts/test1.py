@@ -2,7 +2,7 @@ from dronekit import connect, VehicleMode
 from pymavlink import mavutil
 import time
 
-print("Launching Drone Control Script...")
+print("Launching Drone Control Script 1...")
 
 vehicle = connect('127.0.0.1:60000', heartbeat_timeout=120, wait_ready=True)
 

@@ -1,11 +1,14 @@
+
 #!/bin/bash
 
 if [ -z "$IS_CONTAINER" ]; then
   sudo docker compose down
   sudo docker compose build
   sudo docker compose up -d
-  sudo docker compose exec drone \
-    /bin/bash -ic ./start.sh
+  gazebo --verbose ~/LENS-10mm/worlds/iris_arducopter_runway.world &
+  sudo docker compose exec drone /bin/bash -ic ./start.sh &
+  sudo docker compose exec drone /bin/bash -c \
+    "cd scripts &&  ./setup.sh && ./start.sh"
 else
   source ~/.profile
   ~/ardupilot/Tools/autotest/sim_vehicle.py -v ArduCopter \
