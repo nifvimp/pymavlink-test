@@ -5,6 +5,8 @@ dist
 venv
 .idea
 .git
+
 eeprom.bin
 mav.tlog
 mav.tlog.raw
+mav.parm

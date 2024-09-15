@@ -13,3 +13,6 @@ powershell containerization/create-container.ps1
 ```
 python3 src/simulate.py
 ```
+
+## TODO:
+- auto make venv with python 3.8

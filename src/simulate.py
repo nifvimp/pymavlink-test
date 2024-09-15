@@ -78,8 +78,10 @@ if __name__ == "__main__":
     args.launcher = treat(os.path.abspath(args.launcher))
     args.webots = treat(os.path.abspath(args.webots))
 
-    sim_vehicle_cmd = ["wsl", "-d", args.container, "bash", wslpath(args.launcher), wslpath(args.param), wslpath(args.entrypoint)]
+    sim_vehicle_cmd = ["wsl", "-d", args.container, "bash", wslpath(args.launcher), wslpath(args.param), win_ipaddrs()[0]]
+    vehicle_ctrl_cmd = ["python3", args.entrypoint]
     webots_cmd = ["powershell", ".", args.webots, args.world]
 
     sim_vehicle_p = subprocess.Popen(sim_vehicle_cmd, text=True)
+    drone_ctrl_p = subprocess.Popen(vehicle_ctrl_cmd, text=True)
     webots_p = subprocess.Popen(webots_cmd, text=True)

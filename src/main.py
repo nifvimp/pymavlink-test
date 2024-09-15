@@ -4,7 +4,7 @@ from connection import *
 if __name__ == '__main__':
     # thread = Debug(['SYS_STATUS'])
     # thread.start()
-    drone = DroneBase(socket='tcp:127.0.0.1:5760')
+    drone = DroneBase(socket='172.22.80.1:14550')
     while 1:
         drone.wait_healthy()
         drone.arm()
