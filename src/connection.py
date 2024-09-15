@@ -4,7 +4,7 @@ import time
 import traceback
 from queue import Queue
 from threading import Thread
-from typing import Optional, Union
+from typing import Optional, Union, List, Dict
 import atexit
 
 import numpy as np
@@ -48,9 +48,9 @@ class DroneBase:
         self.last_heartbeat: float = 0
 
         # fancy
-        self.msg_listeners: list = []
-        self.msg_handlers: dict = {}
-        self.recurring: dict = {}
+        self.msg_listeners: List = []
+        self.msg_handlers: Dict = {}
+        self.recurring: Dict = {}
         self.msg_queue: Queue = Queue()
         self.thread_out: Optional[Thread] = None
 
@@ -95,8 +95,8 @@ class DroneBase:
         # init threads
         self.thread_out = Thread(target=self._run, daemon=True)
 
-    def _connect(self) -> (mavtcp | mavtcpin | mavudp | mavmcast | DFReader_binary | CSVReader
-                           | DFReader_text | mavchildexec | mavmmaplog | mavlogfile | mavserial):
+    def _connect(self) -> Union[mavtcp, mavtcpin, mavudp, mavmcast, DFReader_binary, CSVReader
+                        , DFReader_text, mavchildexec, mavmmaplog, mavlogfile, mavserial]:
         return mavutil.mavlink_connection(self.socket,
                                           baud=self.baudrate,
                                           autoreconnect=True,
@@ -204,9 +204,9 @@ class DroneBase:
 
         return decorator
 
-    def handler(self, name: Union[str, list]):
+    def handler(self, name: Union[str, List]):
         def decorator(fn):
-            if isinstance(name, list):
+            if isinstance(name, List):
                 for n in name:
                     self.register_handler(n, fn)
             else:
@@ -262,29 +262,29 @@ class DroneBase:
     def cmd_ack(self, ack):
         result = ack.result
         cmd_name = enums['MAV_CMD'][ack.command].name
-        match result:
-            case 0:
-                log.info("%s: ACCEPTED." % cmd_name)
-            case 1:
-                log.info("%s: TEMPORARILY REJECTED." % cmd_name)
-            case 2:
-                log.info("%s: DENIED." % cmd_name)
-            case 3:
-                log.info("%s: UNSUPPORTED / UNKNOWN." % cmd_name)
-            case 4:
-                log.info("%s: FAILED." % cmd_name)
-            case 5:
-                log.info("%s: CANCELED." % cmd_name)
-            case 6:
-                log.info("%s: IN-PROGRESS." % cmd_name)
-            case 7:
-                log.info("%s: CMD NOT LONG." % cmd_name)
-            case 8:
-                log.info("%s: CMD NOT INT." % cmd_name)
-            case 9:
-                log.info("%s: UNSUPPORTED MAV FRAME." % cmd_name)
-            case _:
-                log.info("???")
+        if result == 0:
+            log.info("%s: ACCEPTED." % cmd_name)
+        elif result == 1:
+            log.info("%s: TEMPORARILY REJECTED." % cmd_name)
+        elif result == 2:
+            log.info("%s: DENIED." % cmd_name)
+        elif result == 3:
+            log.info("%s: UNSUPPORTED / UNKNOWN." % cmd_name)
+        elif result == 4:
+            log.info("%s: FAILED." % cmd_name)
+        elif result == 5:
+            log.info("%s: CANCELED." % cmd_name)
+        elif result == 6:
+            log.info("%s: IN-PROGRESS." % cmd_name)
+        elif result == 7:
+            log.info("%s: CMD NOT LONG." % cmd_name)
+        elif result == 8:
+            log.info("%s: CMD NOT INT." % cmd_name)
+        elif result == 9:
+            log.info("%s: UNSUPPORTED MAV FRAME." % cmd_name)
+        else:
+            log.info("???")
+
         return result == 0
 
     def wait_healthy(self):
@@ -390,7 +390,7 @@ class Attribute:
         self._drone = drone
         self._name = name
 
-    def update(self, name: Union[str, list[str]]):
+    def update(self, name: Union[str, List[str]]):
         def decorator(fn):
             @self._drone.handler(name)
             def wrapper(msg):

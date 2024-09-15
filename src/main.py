@@ -1,13 +1,10 @@
 from connection import *
 
-GSC_HOST = '127.0.0.1'
-GSC_PORT = 5760
 
 if __name__ == '__main__':
     # thread = Debug(['SYS_STATUS'])
     # thread.start()
-    connection_string = 'tcp:%s:%s' % (GSC_HOST, GSC_PORT)
-    drone = DroneBase(socket=connection_string)
+    drone = DroneBase(socket='tcp:127.0.0.1:5760')
     while 1:
         drone.wait_healthy()
         drone.arm()
