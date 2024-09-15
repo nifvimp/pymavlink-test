@@ -14,4 +14,4 @@ $env:PARAM = $Param
 
 docker-compose up --wait;
 start powershell { docker-compose attach simulation }
-docker-compose exec simulation ./vehicle/scripts/sim-run.sh -r $Requirements $Entrypoint
+docker-compose exec simulation /bin/bash -c "/usr/local/vehicle/scripts/sim-run.sh -r $Requirements $Entrypoint & /usr/local/vehicle/scripts/sim-start.sh"

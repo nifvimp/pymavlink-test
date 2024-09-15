@@ -31,8 +31,8 @@ else
 fi
 
 # Set Defaults
-requirements="$HOME/vehicle/${requirements:-"requirements.txt"}"
-entrypoint="$HOME/vehicle/${entrypoint:-"main.py"}"
+requirements="/usr/local/vehicle/${requirements:-"requirements.txt"}"
+entrypoint="/usr/local/vehicle/${entrypoint:-"main.py"}"
 
 # Execute
 pip install -r $requirements

@@ -57,6 +57,11 @@ port=${port:-14550}                 # -p
 socket="${host}:${port}"
 
 # Execute
+shopt -s expand_aliases
+
+source "$HOME"/.ardupilot_env
+source "$HOME"/.profile
+
 declare -a pids
 
 xvfb-run --auto-servernum webots --no-rendering --minimize --stdout --stderr --batch \
