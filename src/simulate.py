@@ -28,7 +28,6 @@ if __name__ == "__main__":
         raise NotImplementedError('')
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    containerization_dir = os.path.join(script_dir, '../containerization')
     parser = argparse.ArgumentParser(description='')
 
     parser.add_argument('--world', type=str, default=os.path.join(script_dir,'../templates/ardupilot-examples/worlds/iris.wbt'), help='')
@@ -66,6 +65,7 @@ if __name__ == "__main__":
 
 
     ## Docker Stuff
+    # containerization_dir = os.path.join(script_dir, '../containerization')
     # os.system(f"cp -r {args.project_directory} {treat(os.path.join(containerization_dir, 'mnt/'))}")
     # os.system(f"cp {args.launcher} {treat(os.path.join(containerization_dir, 'mnt/launcher.sh'))}")
     # os.system(f"cp {args.param} {treat(os.path.join(containerization_dir, 'mnt/vehicle.parm'))}")
