@@ -1,7 +1,7 @@
 FROM ubuntu:20.04 AS ardupilot
 SHELL ["/bin/bash", "-c"]
 
-ARG USER_NAME=drone0
+ARG USER_NAME=drone-container
 ARG USER_UID=1000
 ARG USER_GID=1000
 
@@ -12,7 +12,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install Nessessary Packages
 RUN apt-get update && apt-get install --no-install-recommends -y \
-    bash-completion lsb-release tzdata sudo \
+    bash-completion lsb-release tzdata sudo iproute2 \
     git python3-pip
 
 # Setup Users and Premmisions
@@ -44,7 +44,3 @@ RUN pip install pymavlink dronekit numpy
 RUN sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 WORKDIR /home/${USER_NAME}/
-
-## Setup Display (wsl)
-# ENV PULSE_SERVER=/temp/PulseServer
-# ENV DISPLAY=:0

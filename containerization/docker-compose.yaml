@@ -1,0 +1,22 @@
+volumes:
+  mount:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${PWD}/mnt
+      o: bind
+
+services:
+  simulation:
+    container_name: drone-container
+    build: .
+    working_dir: /home/drone-container/mnt
+    user: drone-container
+    stdin_open: true
+    tty: true
+    volumes:
+      - mount:/home/drone-container/mnt
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    network_mode: "host"
+    entrypoint: "/bin/bash -ic ./launcher.sh"

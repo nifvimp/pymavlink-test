@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 : '
-Drone Container Build Instructions.
+WSL Drone Container Build Instructions.
 '
 set -e
 
@@ -11,9 +11,14 @@ USER_GID=1000
 VEHICLE=copter
 BOARD=sitl
 
+sudo mkdir -p /etc/apt/keyrings && cd /etc/apt/keyrings && sudo wget -q https://cyberbotics.com/Cyberbotics.asc
+echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/Cyberbotics.asc] https://cyberbotics.com/debian binary-amd64/" \
+| tee /etc/apt/sources.list.d/Cyberbotics.list
+
 apt-get update && apt-get install --no-install-recommends -y \
     bash-completion lsb-release tzdata sudo \
-    git python3-pip
+    git python3-pip \
+    webots
 
 groupadd ${USER_NAME} --gid ${USER_GID} \
 && useradd -l -m ${USER_NAME} -u ${USER_UID} -g ${USER_GID} -s /bin/bash \
