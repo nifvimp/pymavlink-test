@@ -1,40 +1,51 @@
 import subprocess
+import cv2
+import socket
+import struct
 
 from connection import *
-from utils import *
 
 ARDUPILOT_PORT = 14550
-
-def win_ipaddrs(interface_regex: str = 'vEthernet*') -> List[str]:
-    cmd = ["powershell", "(Get-NetIPAddress -InterfaceAlias '%s' | Where-Object { $_.AddressFamily -eq 'IPv4' }).IPAddress" % interface_regex]
-    try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
-    except subprocess.CalledProcessError as err:
-        raise RuntimeError(err.stderr) from err
-
-    return proc.stdout.strip().split()
+CAMERA_PORT = 5599
 
 
-def wsl_ipaddrs(distro: str = None) -> List[str]:
-    cmd = (f"wsl -d {distro} -e hostname -I" if distro else "wsl hostname -I").split()
-    try:
-        proc = subprocess.run(cmd, capture_output=True, text=True, check=True)
-    except subprocess.CalledProcessError as err:
-        if err.returncode == 0xFFFFFFFF:
-            # NOTE: WSL errors uses UTF-16LE encoding on stdout for whatever reason
-            err_msg = '\n' + err.stdout.encode('UTF-8').decode('UTF-16LE')
-            raise RuntimeError(err_msg) from err
-        else:
-            raise RuntimeError(err.stderr) from err
+def camera_stuff():
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect(("127.0.0.1", 5599))
 
-    return proc.stdout.strip().split()
+    header_size = struct.calcsize("=HH")
+    while True:
+        # receive header
+        header = s.recv(header_size)
+        if len(header) != header_size:
+            print("Header size mismatch")
+            break
+
+        # parse header
+        width, height = struct.unpack("=HH", header)
+
+        # receive image
+        bytes_to_read = width * height
+        img = bytes()
+        while len(img) < bytes_to_read:
+            img += s.recv(min(bytes_to_read - len(img), 4096))
+
+        ## Do cool stuff with the image here
+        # convert incoming bytes to a numpy array (a grayscale image)
+        img = np.frombuffer(img, np.uint8).reshape((height, width))
+
+        cv2.imshow("image", img)
+        if cv2.waitKey(1) == ord("q"):
+            break
 
 
 if __name__ == '__main__':
-    connection_string = f'{win_ipaddrs()[0]}:{ARDUPILOT_PORT}'
+    # TODO: switch to dronekit (currently using custom ctrl software a.k.a. trash)
+    connection_string = f'127.0.0.1:{ARDUPILOT_PORT}'
     drone = DroneBase(socket=connection_string)
-    # thread = Debug(['SYS_STATUS'])
-    # thread.start()]
+    drone.wait_healthy()
+    camera_thread = threading.Thread(target=camera_stuff, daemon=True)
+    camera_thread.start()
     while 1:
         drone.wait_healthy()
         drone.arm()

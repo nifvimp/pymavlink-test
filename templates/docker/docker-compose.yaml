@@ -9,7 +9,7 @@ volumes:
 services:
   simulation:
     container_name: drone-container
-    build: .
+    build: ../../containerization
     working_dir: /home/drone-container/mnt
     user: drone-container
     stdin_open: true

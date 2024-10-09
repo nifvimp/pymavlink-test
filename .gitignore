@@ -2,6 +2,7 @@
 __pycache__
 containerization/build
 containerization/mnt
+containerization/mnt.
 dist
 venv
 .idea
@@ -11,3 +12,5 @@ eeprom.bin
 mav.tlog
 mav.tlog.raw
 mav.parm
+terrain
+logs
