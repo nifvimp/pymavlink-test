@@ -33,31 +33,40 @@ if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.abspath(__file__))
     parser = argparse.ArgumentParser(description='')
 
-    parser.add_argument('--world', type=str, default=os.path.join(script_dir,'../templates/ardupilot-examples/worlds/iris.wbt'), help='')
-    parser.add_argument('--param', type=str, default=os.path.join(script_dir, '../templates/ardupilot-examples/params/iris.parm'), help='')
+    parser.add_argument('--world', type=str, default=None, help='')
+    parser.add_argument('--param', type=str, default=None, help='')
     parser.add_argument('--entrypoint', type=str, default=os.path.join(script_dir, './main.py'), help='')
-    parser.add_argument('--distro', type=str, default='drone-container', help='')
     parser.add_argument('--launcher', type=str, default=os.path.join(script_dir, 'launcher.sh'), help='')
-
+    parser.add_argument('--simulator', type=str, default='webots', help='')  # must be webots or gazebo
+    parser.add_argument('--distro', type=str, default='drone-container', help='')
     args = parser.parse_args()
 
     treat = lambda path: f"'{path}'" if ' ' in path else path
+
+    if args.simulator == 'webots':
+        args.world = args.world if args.world is not None else os.path.join(script_dir, '../templates/ardupilot-examples/worlds/iris.wbt')
+        args.param = args.param if args.param is not None else os.path.join(script_dir, '../templates/ardupilot-examples/params/iris.parm')
+        sim_vehicle_args = [f"--add-param-file={wslpath(args.param)}"]
+    if args.simulator == 'gazebo':
+        args.world = args.world if args.world is not None else os.path.join(script_dir, '../templates/ardupilot-examples/worlds/iris.wbt')
+        args.param = args.param if args.param is not None else os.path.join(script_dir, '../templates/ardupilot-examples/params/iris.parm')
+        sim_vehicle_args = ["-f", "gazebo-iris"]
 
     args.world = treat(args.world if args.world.startswith('/') else os.path.abspath(args.world))
     args.param = treat(args.param if args.world.startswith('/') else os.path.abspath(args.param))
     args.entrypoint = treat(args.entrypoint if args.world.startswith('/') else os.path.abspath(args.entrypoint))
     args.launcher = treat(args.launcher if args.world.startswith('/') else os.path.abspath(args.launcher))
 
-    sim_vehicle_cmd = ["wsl", "-d", args.distro, wslpath(args.launcher), wslpath(args.param)]
-    webots_cmd = ["wsl", "-d", args.distro, "webots", wslpath(args.world)]
+    sim_vehicle_cmd = ["wsl", "-d", args.distro, wslpath(args.launcher), *sim_vehicle_args]
+    simulator_cmd = ["wsl", "-d", args.distro, args.simulator, wslpath(args.world)]
     vehicle_ctrl_cmd = ["wsl", "-d", args.distro, "python3", wslpath(args.entrypoint)]
 
     print(" ".join(sim_vehicle_cmd))
-    print(" ".join(webots_cmd))
+    print(" ".join(simulator_cmd))
     print(" ".join(vehicle_ctrl_cmd))
 
     sim_vehicle_p = subprocess.Popen(sim_vehicle_cmd, text=True)
-    webots_p = subprocess.Popen(webots_cmd, text=True)
+    webots_p = subprocess.Popen(simulator_cmd, text=True)
     vehicle_ctrl_p = subprocess.Popen(vehicle_ctrl_cmd, text=True)
 
     try:
@@ -72,7 +81,7 @@ if __name__ == "__main__":
 ## Docker Stuff
 # containerization_dir = os.path.join(script_dir, '../containerization')
 # os.system(f"cp -r {args.project_directory} {treat(os.path.join(containerization_dir, 'mnt/'))}")
-# os.system(f"cp {args.launcher} {treat(os.path.join(containerization_dir, 'mnt/launcher.sh'))}")
+# os.system(f"cp {args.launcher} {treat(os.path.join(containerization_dir, 'mnt/launcher.sh'))}")ls
 # os.system(f"cp {args.param} {treat(os.path.join(containerization_dir, 'mnt/vehicle.parm'))}")
 # sim_vehicle_cmd = ["docker", "compose", "--project-directory", treat(containerization_dir), "up"]
 # webots_cmd = [args.webots, args.world]
