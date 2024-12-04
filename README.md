@@ -1,34 +1,32 @@
 # Windows Ardupilot-Webots SITL
-scripts to help setup Ardupilot-Webots SITL environment on Windows.
-## Install
-- webots: https://cyberbotics.com/doc/guide/installation-procedure#installation-on-windows
-- wsl2: https://learn.microsoft.com/en-us/wsl/install
-## Setting Up
-### Create wsl2 container
+Collection of helpful scripts to setup an Ardupilot-Webots SITL environment on Windows.
 
+## Setup
+### Install WSL2
+Install WSL2 by running the following command in powershell as an administrator.
+
+```shell
+wsl --install
 ```
+https://learn.microsoft.com/en-us/wsl/install
+
+### Create custom WSL distro
+Create a custom WSL distro to host the Ardupilot-Webots SITL environment.
+
+```shell
 powershell containerization/create-container.ps1
 ```
-### Prepare simulation
-add simulation address to the drone's controller args in `templates/ardupilot-examples/worlds/iris.wbt`.
-```
-Iris {
-  translation 0 0 0.09
-  controller "ardupilot_vehicle_controller"
-  controllerArgs [
-    "--motors"
-    "m1_motor, m2_motor, m3_motor, m4_motor"
-    "--sitl-address"
-    "172.22.84.123"
-  ]
-  extensionSlot [
-  ]
-}
-```
-### Launch simulation
-```
+
+## Launch simulation
+
+To launch a simulation, run the following shell command from the root directory of the project.
+### basic example
+```shell
 python3 src/simulate.py
 ```
 
-## TODO:
-- auto make venv with python 3.8
+### Computer Vision Example
+```shell
+python3 src/simulate.py --world templates/ardupilot-examples/worlds/iris_camera_down.wbt --entrypoint src/main_cv.py
+```
+

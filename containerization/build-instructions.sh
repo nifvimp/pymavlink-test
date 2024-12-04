@@ -13,21 +13,16 @@ BOARD=sitl
 
 # Install Apt Dependencies
 apt-get update && apt-get install --no-install-recommends -y \
-	lsb-release gnupg curl tzdata sudo xvfb git python3-pip
+	lsb-release gnupg curl tzdata sudo xvfb git python3-pip \
+	python3-opencv
 
 # Add Webots Apt Repository
 sudo mkdir -p /etc/apt/keyrings && cd /etc/apt/keyrings && sudo wget -q https://cyberbotics.com/Cyberbotics.asc
 echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/Cyberbotics.asc] https://cyberbotics.com/debian binary-amd64/" \
 | sudo tee /etc/apt/sources.list.d/Cyberbotics.list
 
-# Add Gazebo Apt Repository
-echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" \
-| sudo tee /etc/apt/sources.list.d/gazebo-stable.list
-wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
-
-# Install Webots and Gazebo
-apt-get update && apt-get install --no-install-recommends -y \
-	webots gazebo11 libgazebo11-dev
+# Install Webots
+apt-get update && apt-get install --no-install-recommends -y webots
 
 # Create User
 groupadd ${USER_NAME} --gid ${USER_GID} \
@@ -50,7 +45,7 @@ sudo -u ${USER_NAME} /bin/bash <<-EOSU
 	&& ./waf configure --board ${BOARD} \
 	&& ./waf ${VEHICLE}
 
-	pip install pymavlink dronekit numpy
+	pip install pymavlink dronekit numpy matplotlib opencv-python
 EOSU
 
 # Setup WSL
